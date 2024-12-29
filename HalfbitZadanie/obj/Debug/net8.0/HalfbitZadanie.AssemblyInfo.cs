@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HalfbitZadanie")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3decd3e5c14183b35638181ba903aab4d13c4d40")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d1d2527f4781a253452ee0affc5b88228424e490")]
 [assembly: System.Reflection.AssemblyProductAttribute("HalfbitZadanie")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HalfbitZadanie")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

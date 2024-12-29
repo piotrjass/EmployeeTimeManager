@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\HalfbitZadanie"
+    "\\HalfbitZadanie",
+    "\\HalfbitZadanie\\Repositories"
   ],
-  "SelectedNode": "\\HalfbitZadanie\\Program.cs",
+  "SelectedNode": "\\HalfbitZadanie.sln",
   "PreviewInSolutionExplorer": false
 }
