@@ -8,30 +8,31 @@ using Npgsql;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
 // Request Validations
 builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<AddEmployeeValidator>());
-//Łączenie z bazą danych
-builder.Services.AddSingleton<NpgsqlConnection>(sp =>
+
+// Database connection
+builder.Services.AddSingleton(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    return new NpgsqlConnection(connectionString);
+    return connectionString; // Przekazujemy connection string, a nie instancję NpgsqlConnection
 });
-//
-builder.Services.AddScoped<IEmployeeRepository, EmployeesRepository>();
+
+// Repositories - Rejestracja repozytoriów z connection string
+builder.Services.AddScoped<IEmployeeRepository>(sp =>
+{
+    var connectionString = sp.GetRequiredService<string>(); // Pobieramy connection string z DI
+    return new EmployeesRepository(connectionString); // Przekazujemy connection string do repozytorium
+});
 
 var app = builder.Build();
-
-/*app.MapGet("/", async (NpgsqlConnection db) =>
-{
-    await db.OpenAsync();
-    return Results.Ok("Połączenie z bazą danych nawiązane!");
-});*/
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -41,9 +42,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

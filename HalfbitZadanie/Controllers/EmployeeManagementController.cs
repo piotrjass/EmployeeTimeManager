@@ -34,7 +34,7 @@ namespace HalfbitZadanie.Controllers
             }
             return Ok(result); 
         }
-        [HttpPost(Name = "AddEmployee")]
+     
         [HttpPost(Name = "AddEmployee")]
         public async Task<ActionResult<Employee>> AddEmployee([FromBody] Employee newEmployee)
         {
