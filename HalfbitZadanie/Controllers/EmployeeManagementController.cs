@@ -1,54 +1,79 @@
+using HalfbitZadanie.Commands.Employee;
 using HalfbitZadanie.Models;
 using HalfbitZadanie.Queries.Employee;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HalfbitZadanie.Controllers;
-
-[ApiController]
-[Route("api/employees")]
-public class EmployeeManagementController : ControllerBase
+namespace HalfbitZadanie.Controllers
 {
-    private readonly IMediator _mediator;
-
-    public EmployeeManagementController(IMediator mediator)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class EmployeeManagementController : ControllerBase
     {
-        _mediator = mediator;
-    }
+        private readonly IMediator _mediator;
 
-    // Pobranie listy pracowników
-    [HttpGet(Name = "GetAllEmployees")]
-    public async Task<ActionResult<List<Employee>>> GetAllEmployees()
-    {
-        var result = await _mediator.Send(new GetAllEmployeesQuery());
-        return result;
-    }
+        public EmployeeManagementController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+        
+        [HttpGet(Name = "GetAllEmployees")]
+        public async Task<ActionResult<List<Employee>>> GetAllEmployees()
+        {
+            var result = await _mediator.Send(new GetAllEmployeesQuery());
+            return Ok(result); 
+        }
+        
+        [HttpGet("{id}", Name = "GetEmployeeById")]
+        public async Task<ActionResult<Employee>> GetEmployeeById(int id)
+        {
+            var result = await _mediator.Send(new GetEmployeeByIdQuery(id));
+            if (result == null)
+            {
+                return NotFound(); 
+            }
+            return Ok(result); 
+        }
+        [HttpPost(Name = "AddEmployee")]
+        [HttpPost(Name = "AddEmployee")]
+        public async Task<ActionResult<Employee>> AddEmployee([FromBody] Employee newEmployee)
+        {
+            var result = await _mediator.Send(new AddEmployeeCommand(
+                newEmployee.FirstName, 
+                newEmployee.LastName, 
+                newEmployee.Email
+            ));
 
-    // Pobranie szczegółów pracownika
-    [HttpGet("{id}", Name = "GetEmployeeById")]
-    public async Task<ActionResult<Employee>> GetEmployeeById(int id)
-    {
-        return Ok(); // Placeholder logic
-    }
+            return Ok(result);
+        }
+        
+        [HttpPut("{id}", Name = "UpdateEmployee")]
+        public async Task<ActionResult> UpdateEmployee(int id, [FromBody] Employee updatedEmployee)
+        {
+            var result = await _mediator.Send(new UpdateEmployeeCommand(
+                id,
+                updatedEmployee.FirstName,
+                updatedEmployee.LastName,
+                updatedEmployee.Email
+            ));
 
-    // Dodawanie nowego pracownika
-    [HttpPost(Name = "AddEmployee")]
-    public async Task<ActionResult<Employee>> AddEmployee([FromBody] Employee newEmployee)
-    {
-        return Ok(); // Placeholder logic
-    }
+            if (result == null)
+            {
+                return NotFound(); // Jeśli pracownik nie został znaleziony, zwróć NotFound
+            }
 
-    // Aktualizacja danych pracownika
-    [HttpPut("{id}", Name = "UpdateEmployee")]
-    public async Task<ActionResult> UpdateEmployee(int id, [FromBody] Employee updatedEmployee)
-    {
-        return Ok(); // Placeholder logic
-    }
-
-    // Usuwanie pracownika
-    [HttpDelete("{id}", Name = "DeleteEmployee")]
-    public async Task<ActionResult> DeleteEmployee(int id)
-    {
-        return Ok(); // Placeholder logic
+            return Ok(result); // Zwróć zaaktualizowanego pracownika
+        }
+     
+        [HttpDelete("{id}", Name = "DeleteEmployee")]
+        public async Task<ActionResult> DeleteEmployee(int id)
+        {
+              var result = await _mediator.Send(new DeleteEmployeeCommand(id));
+            if (!result)
+            {
+                return NotFound(); 
+            }
+            return NoContent(); 
+        }
     }
 }

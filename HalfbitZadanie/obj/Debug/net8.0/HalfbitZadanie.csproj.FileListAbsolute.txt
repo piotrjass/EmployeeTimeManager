@@ -36,3 +36,7 @@ C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\MediatR.Ex
 C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\FluentValidation.dll
 C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\FluentValidation.AspNetCore.dll
 C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\FluentValidation.DependencyInjectionExtensions.dll
+C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\Npgsql.dll
+C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\obj\Debug\net8.0\HalfbitZadanie.sourcelink.json

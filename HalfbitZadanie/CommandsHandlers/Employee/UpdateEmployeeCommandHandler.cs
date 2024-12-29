@@ -1,31 +1,35 @@
 using HalfbitZadanie.Commands.Employee;
+using HalfbitZadanie.IRepositories;
 using MediatR;
 
 namespace HalfbitZadanie.CommandsHandlers.Employee;
 
-public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeCommand>
+public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeCommand, Models.Employee>
 {
- //   private readonly ApplicationDbContext _context;
+    private readonly IEmployeeRepository _employeeRepository;
 
-    public UpdateEmployeeCommandHandler()
+    public UpdateEmployeeCommandHandler(IEmployeeRepository employeeRepository)
     {
-   //     _context = context;
+        _employeeRepository = employeeRepository;
     }
 
-    public async Task Handle(UpdateEmployeeCommand request, CancellationToken cancellationToken)
+    public async Task<Models.Employee> Handle(UpdateEmployeeCommand request, CancellationToken cancellationToken)
     {
-       // var employee = await _context.Employees.FindAsync(new object[] { request.EmployeeId }, cancellationToken);
-      //  if (employee == null)
-      //  {
-      //      throw new KeyNotFoundException("Employee not found");
-      //  }
+        var employee = await _employeeRepository.GetEmployeeByIdAsync(request.EmployeeId);
 
-      //  employee.FirstName = request.FirstName;
-      //  employee.LastName = request.LastName;
-      //  employee.Email = request.Email;
+        if (employee == null)
+        {
+            return null; 
+        }
 
-      //  await _context.SaveChangesAsync(cancellationToken);
+       
+        employee.FirstName = request.FirstName;
+        employee.LastName = request.LastName;
+        employee.Email = request.Email;
 
-     //   return Unit.Value;
+      
+        await _employeeRepository.UpdateEmployeeAsync(request.EmployeeId, employee);
+
+        return employee; 
     }
 }

@@ -1,28 +1,26 @@
 using HalfbitZadanie.Commands.Employee;
+using HalfbitZadanie.IRepositories;
 using MediatR;
 
 namespace HalfbitZadanie.CommandsHandlers.Employee;
 
-public class DeleteEmployeeCommandHandler : IRequestHandler<DeleteEmployeeCommand>
+public class DeleteEmployeeCommandHandler : IRequestHandler<DeleteEmployeeCommand, bool>
 {
-   // private readonly ApplicationDbContext _context;
+    private readonly IEmployeeRepository _employeeRepository;
 
-    public DeleteEmployeeCommandHandler()
+    public DeleteEmployeeCommandHandler(IEmployeeRepository employeeRepository)
     {
-      //  _context = context;
+        _employeeRepository = employeeRepository;
     }
 
-    public async Task Handle(DeleteEmployeeCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteEmployeeCommand request, CancellationToken cancellationToken)
     {
-     //   var employee = await _context.Employees.FindAsync(new object[] { request.EmployeeId }, cancellationToken);
-     //   if (employee == null)
-     //   {
-      //      throw new KeyNotFoundException("Employee not found");
-      //  }
-
-      //  _context.Employees.Remove(employee);
-      //  await _context.SaveChangesAsync(cancellationToken);
-
-       // return Unit.Value;
+        var employee = await _employeeRepository.GetEmployeeByIdAsync(request.EmployeeId);
+        if (employee == null)
+        {
+            return false; 
+        }
+        await _employeeRepository.DeleteEmployeeAsync(request.EmployeeId);
+        return true; 
     }
 }

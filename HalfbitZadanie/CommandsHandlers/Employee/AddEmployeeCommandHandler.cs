@@ -1,13 +1,15 @@
 using HalfbitZadanie.Commands.Employee;
+using HalfbitZadanie.IRepositories;
 using MediatR;
 namespace HalfbitZadanie.CommandsHandlers.Employee;
 
 public class AddEmployeeCommandHandler : IRequestHandler<AddEmployeeCommand, Models.Employee>
 {
-   // private readonly ApplicationDbContext _context;
+    private readonly IEmployeeRepository _employeeRepository;
 
-    public AddEmployeeCommandHandler()
+    public AddEmployeeCommandHandler(IEmployeeRepository employeeRepository)
     {
+        _employeeRepository = employeeRepository;
     }
 
     public async Task<Models.Employee> Handle(AddEmployeeCommand request, CancellationToken cancellationToken)
@@ -18,8 +20,8 @@ public class AddEmployeeCommandHandler : IRequestHandler<AddEmployeeCommand, Mod
             LastName = request.LastName,
             Email = request.Email
         };
-        // _context.Employees.Add(employee);
-        // await _context.SaveChangesAsync(cancellationToken);
+        
+        await _employeeRepository.AddEmployeeAsync(employee);
         return employee;
     }
 }
