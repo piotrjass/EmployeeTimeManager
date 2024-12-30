@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Tests
 {
-    public class UnitTests
+    public class ValidationUnitTests
     {
         [Fact]
         public void Should_ThrowValidationError_When_FirstNameIsEmpty()
