@@ -90,19 +90,37 @@ public class EmployeesRepository : IEmployeeRepository
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync();
+            
+            var checkQuery = @"
+        SELECT COUNT(1)
+        FROM Employees
+        WHERE Email = @Email;";
 
-            var query = @"
-            INSERT INTO Employees (FirstName, LastName, Email)
-            VALUES (@FirstName, @LastName, @Email)
-            RETURNING Id;";
-
-            using (var command = new NpgsqlCommand(query, connection))
+            using (var checkCommand = new NpgsqlCommand(checkQuery, connection))
             {
-                command.Parameters.AddWithValue("@FirstName", employee.FirstName);
-                command.Parameters.AddWithValue("@LastName", employee.LastName);
-                command.Parameters.AddWithValue("@Email", employee.Email);
+                checkCommand.Parameters.AddWithValue("@Email", employee.Email);
 
-                employee.Id = (int)await command.ExecuteScalarAsync(); 
+                var count = (long)await checkCommand.ExecuteScalarAsync();
+
+                if (count > 0)
+                {
+                    throw new InvalidOperationException($"Użytkownik z adresem e-mail '{employee.Email}' już istnieje.");
+                }
+            }
+
+            // Jeśli email jest unikalny, dodaj nowego użytkownika
+            var insertQuery = @"
+        INSERT INTO Employees (FirstName, LastName, Email)
+        VALUES (@FirstName, @LastName, @Email)
+        RETURNING Id;";
+
+            using (var insertCommand = new NpgsqlCommand(insertQuery, connection))
+            {
+                insertCommand.Parameters.AddWithValue("@FirstName", employee.FirstName);
+                insertCommand.Parameters.AddWithValue("@LastName", employee.LastName);
+                insertCommand.Parameters.AddWithValue("@Email", employee.Email);
+
+                employee.Id = (int)await insertCommand.ExecuteScalarAsync();
             }
         }
     }
