@@ -40,3 +40,5 @@ C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\Microsoft.
 C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\Npgsql.dll
 C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\obj\Debug\net8.0\HalfbitZadanie.sourcelink.json
+C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\AutoFixture.dll
+C:\Users\gofrf\Desktop\HalfbitZadanie\HalfbitZadanie\bin\Debug\net8.0\Fare.dll

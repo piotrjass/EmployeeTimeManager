@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "BqmetrSgPi8=",
+  "dgSpecHash": "O/UWPsMaNW0=",
   "success": true,
   "projectFilePath": "C:\\Users\\gofrf\\Desktop\\HalfbitZadanie\\HalfbitZadanie\\HalfbitZadanie.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\gofrf\\.nuget\\packages\\autofixture\\5.0.0-preview0011\\autofixture.5.0.0-preview0011.nupkg.sha512",
+    "C:\\Users\\gofrf\\.nuget\\packages\\fare\\2.2.1\\fare.2.2.1.nupkg.sha512",
     "C:\\Users\\gofrf\\.nuget\\packages\\fluentvalidation\\11.11.0\\fluentvalidation.11.11.0.nupkg.sha512",
     "C:\\Users\\gofrf\\.nuget\\packages\\fluentvalidation.aspnetcore\\11.3.0\\fluentvalidation.aspnetcore.11.3.0.nupkg.sha512",
     "C:\\Users\\gofrf\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\11.11.0\\fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512",
@@ -18,7 +20,8 @@
     "C:\\Users\\gofrf\\.nuget\\packages\\swashbuckle.aspnetcore\\6.4.0\\swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
     "C:\\Users\\gofrf\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.4.0\\swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
     "C:\\Users\\gofrf\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.4.0\\swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",
-    "C:\\Users\\gofrf\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.4.0\\swashbuckle.aspnetcore.swaggerui.6.4.0.nupkg.sha512"
+    "C:\\Users\\gofrf\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.4.0\\swashbuckle.aspnetcore.swaggerui.6.4.0.nupkg.sha512",
+    "C:\\Users\\gofrf\\.nuget\\packages\\system.componentmodel.annotations\\4.4.0\\system.componentmodel.annotations.4.4.0.nupkg.sha512"
   ],
   "logs": [
     {

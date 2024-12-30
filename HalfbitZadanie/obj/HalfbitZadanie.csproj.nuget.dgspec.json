@@ -46,6 +46,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "AutoFixture": {
+              "target": "Package",
+              "version": "[5.0.0-preview0011, )"
+            },
             "FluentValidation": {
               "target": "Package",
               "version": "[11.11.0, )"
