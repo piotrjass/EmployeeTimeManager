@@ -19,6 +19,24 @@ public class EmployeesRepository : IEmployeeRepository
         return new NpgsqlConnection(_connectionString);
     }
 
+
+    private async Task CheckIfUserExists(int id, NpgsqlConnection connection)
+    {
+        var query = "SELECT COUNT(1) FROM Employees WHERE Id = @Id";
+
+        using (var command = new NpgsqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Id", id);
+
+            var count = (long)await command.ExecuteScalarAsync();
+
+            if (count == 0)
+            {
+                throw new InvalidOperationException($"Pracownik o ID {id} nie istnieje.");
+            }
+        }
+    }
+
     public async Task<List<Employee>> GetAllEmployeesAsync()
     {
         var employees = new List<Employee>();
@@ -27,7 +45,6 @@ public class EmployeesRepository : IEmployeeRepository
         {
             await connection.OpenAsync();
 
-        
             var query = "SELECT Id, FirstName, LastName, Email FROM Employees";
 
             using (var command = new NpgsqlCommand(query, connection))
@@ -48,18 +65,22 @@ public class EmployeesRepository : IEmployeeRepository
             }
         }
 
+        if (employees.Count == 0)
+        {
+            throw new InvalidOperationException("Brak użytkowników w bazie.");
+        }
+
         return employees;
     }
 
     public async Task<Employee> GetEmployeeByIdAsync(int id)
     {
-        Employee employee = null;
-
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync();
 
-        
+            await CheckIfUserExists(id, connection);
+
             var query = "SELECT Id, FirstName, LastName, Email FROM Employees WHERE Id = @Id";
 
             using (var command = new NpgsqlCommand(query, connection))
@@ -70,7 +91,7 @@ public class EmployeesRepository : IEmployeeRepository
                 {
                     if (await reader.ReadAsync())
                     {
-                        employee = new Employee
+                        return new Employee
                         {
                             Id = reader.GetInt32(0),
                             FirstName = reader.GetString(1),
@@ -78,11 +99,13 @@ public class EmployeesRepository : IEmployeeRepository
                             Email = reader.GetString(3)
                         };
                     }
+                    else
+                    {
+                        throw new InvalidOperationException($"Pracownik o ID {id} nie istnieje.");
+                    }
                 }
             }
         }
-
-        return employee;
     }
 
     public async Task AddEmployeeAsync(Employee employee)
@@ -108,7 +131,7 @@ public class EmployeesRepository : IEmployeeRepository
                 }
             }
 
-            // Jeśli email jest unikalny, dodaj nowego użytkownika
+       
             var insertQuery = @"
         INSERT INTO Employees (FirstName, LastName, Email)
         VALUES (@FirstName, @LastName, @Email)
@@ -131,11 +154,14 @@ public class EmployeesRepository : IEmployeeRepository
         {
             await connection.OpenAsync();
 
+            
+            await CheckIfUserExists(id, connection);
+
             var query = @"
-            UPDATE Employees
-            SET FirstName = @FirstName, LastName = @LastName, Email = @Email
-            WHERE Id = @Id
-            RETURNING Id, FirstName, LastName, Email;";
+        UPDATE Employees
+        SET FirstName = @FirstName, LastName = @LastName, Email = @Email
+        WHERE Id = @Id
+        RETURNING Id, FirstName, LastName, Email;";
 
             using (var command = new NpgsqlCommand(query, connection))
             {
@@ -162,12 +188,14 @@ public class EmployeesRepository : IEmployeeRepository
 
         return null;
     }
-
     public async Task DeleteEmployeeAsync(int id)
     {
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync();
+
+            
+            await CheckIfUserExists(id, connection);
 
             var query = "DELETE FROM Employees WHERE Id = @Id";
 
@@ -175,7 +203,7 @@ public class EmployeesRepository : IEmployeeRepository
             {
                 command.Parameters.AddWithValue("@Id", id);
 
-                await command.ExecuteNonQueryAsync(); 
+                await command.ExecuteNonQueryAsync();
             }
         }
     }
@@ -187,6 +215,9 @@ public class EmployeesRepository : IEmployeeRepository
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync();
+
+         
+            await CheckIfUserExists(employeeId, connection);
 
             var query = "SELECT Id, EmployeeId, Date, HoursWorked FROM TimeEntries WHERE EmployeeId = @EmployeeId";
 
@@ -222,6 +253,8 @@ public class EmployeesRepository : IEmployeeRepository
         {
             await connection.OpenAsync();
 
+            await CheckIfUserExists(employeeId, connection);
+
             var query = "SELECT Id, EmployeeId, Date, HoursWorked FROM TimeEntries WHERE EmployeeId = @EmployeeId AND Id = @EntryId";
 
             using (var command = new NpgsqlCommand(query, connection))
@@ -241,64 +274,43 @@ public class EmployeesRepository : IEmployeeRepository
                             HoursWorked = reader.GetInt32(3)
                         };
                     }
+                    else
+                    {
+                        // Jeśli brak wpisu dla tego entryId, rzucamy wyjątek
+                        throw new InvalidOperationException($"Brak wpisu czasu pracy o ID {entryId} dla pracownika o ID {employeeId}.");
+                    }
                 }
             }
         }
 
         return timeEntry;
     }
-
- public async Task AddTimeEntryAsync(TimeEntry timeEntry)
+    public async Task AddTimeEntryAsync(TimeEntry timeEntry)
+    {
+        using (var connection = new NpgsqlConnection(_connectionString))
         {
-            // walidacja czy pracownik istnieje
-            using (var connection = new NpgsqlConnection(_connectionString))
+            await connection.OpenAsync();
+
+            await CheckIfUserExists(timeEntry.EmployeeId, connection);
+       
+            var query = @"
+            SELECT COUNT(1)
+            FROM TimeEntries
+            WHERE EmployeeId = @EmployeeId
+            AND Date = @Date";
+
+            using (var command = new NpgsqlCommand(query, connection))
             {
-                await connection.OpenAsync();
+                var data = new DateTime(timeEntry.Date.Year, timeEntry.Date.Month, timeEntry.Date.Day, 0, 0, 0);
+                command.Parameters.AddWithValue("@EmployeeId", timeEntry.EmployeeId);
+                command.Parameters.AddWithValue("@Date", data);
+                var count = (long)await command.ExecuteScalarAsync();
 
-                var query = "SELECT COUNT(1) FROM Employees WHERE Id = @EmployeeId";
-
-                using (var command = new NpgsqlCommand(query, connection))
+                if (count > 0)
                 {
-                    command.Parameters.AddWithValue("@EmployeeId", timeEntry.EmployeeId);
-
-                    var count = (long)await command.ExecuteScalarAsync();
-
-                    if (count == 0)
-                    {
-                        throw new InvalidOperationException("Pracownik o podanym identyfikatorze nie istnieje.");
-                    }
+                    throw new InvalidOperationException("Pracownik już ma zarejestrowane godziny pracy w tej dacie.");
                 }
             }
-            // Walidacja, czy pracownik ma już wpis w tej samej dacie
-
-            using (var connection = new NpgsqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-                
-                var query = @"
-                SELECT COUNT(1)
-               FROM TimeEntries
-                  WHERE EmployeeId = @EmployeeId
-                AND Date = @Date
-                  ";
-                
-                
-                
-                using (var command = new NpgsqlCommand(query, connection))
-                {
-                    var data = new DateTime(timeEntry.Date.Year, timeEntry.Date.Month, timeEntry.Date.Day, 0, 0, 0);
-                    command.Parameters.AddWithValue("@EmployeeId", timeEntry.EmployeeId);
-                    command.Parameters.AddWithValue("@Date", data);  
-                    var count = (long)await command.ExecuteScalarAsync();
-                    
-                    
-                    if (count > 0)
-                    {
-                        throw new InvalidOperationException("Pracownik już ma zarejestrowane godziny pracy w tej dacie.");
-                    }
-                }
-            }
-
 
             // Walidacja godziny pracy
             if (timeEntry.HoursWorked < 1 || timeEntry.HoursWorked > 24)
@@ -307,22 +319,18 @@ public class EmployeesRepository : IEmployeeRepository
             }
 
             // Jeśli walidacja przeszła, dodajemy wpis
-            using (var connection = new NpgsqlConnection(_connectionString))
+            var insertQuery = "INSERT INTO TimeEntries (EmployeeId, Date, HoursWorked) VALUES (@EmployeeId, @Date, @HoursWorked)";
+
+            using (var command = new NpgsqlCommand(insertQuery, connection))
             {
-                await connection.OpenAsync();
+                command.Parameters.AddWithValue("@EmployeeId", timeEntry.EmployeeId);
+                command.Parameters.AddWithValue("@Date", timeEntry.Date);
+                command.Parameters.AddWithValue("@HoursWorked", timeEntry.HoursWorked);
 
-                var query = "INSERT INTO TimeEntries (EmployeeId, Date, HoursWorked) VALUES (@EmployeeId, @Date, @HoursWorked)";
-
-                using (var command = new NpgsqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeId", timeEntry.EmployeeId);
-                    command.Parameters.AddWithValue("@Date", timeEntry.Date);
-                    command.Parameters.AddWithValue("@HoursWorked", timeEntry.HoursWorked);
-
-                    await command.ExecuteNonQueryAsync();
-                }
+                await command.ExecuteNonQueryAsync();
             }
         }
+    }
 
     public async Task<TimeEntry> UpdateTimeEntryAsync(int employeeId, int entryId, TimeEntry updatedTimeEntry)
     {
@@ -331,6 +339,8 @@ public class EmployeesRepository : IEmployeeRepository
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync();
+
+            await CheckIfUserExists(employeeId, connection);
 
             var query = "UPDATE TimeEntries SET Date = @Date, HoursWorked = @HoursWorked WHERE EmployeeId = @EmployeeId AND Id = @EntryId";
 
@@ -353,6 +363,10 @@ public class EmployeesRepository : IEmployeeRepository
                         HoursWorked = updatedTimeEntry.HoursWorked
                     };
                 }
+                else
+                {
+                    throw new InvalidOperationException("Nie znaleziono wpisu czasu pracy do zaktualizowania.");
+                }
             }
         }
 
@@ -365,14 +379,34 @@ public class EmployeesRepository : IEmployeeRepository
         {
             await connection.OpenAsync();
 
-            var query = "DELETE FROM TimeEntries WHERE EmployeeId = @EmployeeId AND Id = @EntryId";
+            // Sprawdzenie, czy pracownik istnieje
+            await CheckIfUserExists(employeeId, connection);
 
-            using (var command = new NpgsqlCommand(query, connection))
+            // Sprawdzenie, czy wpis czasu pracy o danym entryId istnieje dla pracownika
+            var queryCheckEntryExists = "SELECT COUNT(1) FROM TimeEntries WHERE EmployeeId = @EmployeeId AND Id = @EntryId";
+
+            using (var commandCheckEntry = new NpgsqlCommand(queryCheckEntryExists, connection))
             {
-                command.Parameters.AddWithValue("@EmployeeId", employeeId);
-                command.Parameters.AddWithValue("@EntryId", entryId);
+                commandCheckEntry.Parameters.AddWithValue("@EmployeeId", employeeId);
+                commandCheckEntry.Parameters.AddWithValue("@EntryId", entryId);
 
-                await command.ExecuteNonQueryAsync();
+                var count = (long)await commandCheckEntry.ExecuteScalarAsync();
+
+                if (count == 0)
+                {
+                    throw new InvalidOperationException($"Nie znaleziono wpisu czasu pracy o identyfikatorze {entryId} dla pracownika o identyfikatorze {employeeId}.");
+                }
+            }
+
+            // Jeśli wpis istnieje, usuwamy go
+            var queryDeleteEntry = "DELETE FROM TimeEntries WHERE EmployeeId = @EmployeeId AND Id = @EntryId";
+
+            using (var commandDelete = new NpgsqlCommand(queryDeleteEntry, connection))
+            {
+                commandDelete.Parameters.AddWithValue("@EmployeeId", employeeId);
+                commandDelete.Parameters.AddWithValue("@EntryId", entryId);
+
+                await commandDelete.ExecuteNonQueryAsync();
             }
         }
     }
