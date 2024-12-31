@@ -1,0 +1,14 @@
+﻿CREATE TABLE IF NOT EXISTS Employees (
+    Id SERIAL PRIMARY KEY,            
+    FirstName VARCHAR(100) NOT NULL,  
+    LastName VARCHAR(100) NOT NULL,    
+    Email VARCHAR(255) UNIQUE NOT NULL 
+);
+
+
+CREATE TABLE IF NOT EXISTS TimeEntries (
+    Id SERIAL PRIMARY KEY,            
+    EmployeeId INT NOT NULL REFERENCES Employees(Id) ON DELETE CASCADE, 
+    Date TIMESTAMP NOT NULL,           
+    HoursWorked INT CHECK (HoursWorked >= 1 AND HoursWorked <= 24)  
+);

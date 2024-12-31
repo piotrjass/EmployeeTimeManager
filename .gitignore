@@ -1,0 +1,17 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.containers/employees-db
+/Tests
+/obj
+/.vs/HalfbitZadanie/FileContentIndex
+/.vs/HalfbitZadanie/v17/TestStore/0
+/.vs/HalfbitZadanie/v17/.suo
+/bin/Debug
+/HalfbitZadanie/bin/Debug/net8.0
+/HalfbitZadanie/obj/HalfbitZadanie.csproj.nuget.dgspec.json
+/HalfbitZadanie/obj/HalfbitZadanie.csproj.nuget.g.props
+/HalfbitZadanie/obj/project.nuget.cache
+/HalfbitZadanie/obj/Debug/net8.0/HalfbitZadanie.AssemblyInfo.cs
+/HalfbitZadanie/obj/Debug/net8.0/HalfbitZadanie.AssemblyInfoInputs.cache
