@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.containers/employees-db
+/obj
+/HalfbitZadanie/bin/Debug/net8.0
+/HalfbitZadanie/obj
+/bin/Debug
+/.vs
+/.idea
+/Tests/bin/Debug/net8.0
+/Tests/obj

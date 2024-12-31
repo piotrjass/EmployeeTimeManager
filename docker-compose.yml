@@ -1,0 +1,24 @@
+version: '3.4'
+
+services:
+  halfbitzadanie:
+    image: ${DOCKER_REGISTRY-}halfbitzadanie
+    build:
+      context: .
+      dockerfile: HalfbitZadanie/Dockerfile
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+
+  employees.database:
+    image: postgres:latest
+    container_name: employees.database
+    environment:
+      - POSTGRES_DB=EmployeeManager
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+    volumes:
+      - ./.containers/employees-db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
